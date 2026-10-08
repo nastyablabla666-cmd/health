@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="../healthTests/healthTests.csproj" Id="bfa82385-9137-4bea-9721-05a05a07280a" />
   <Project Path="health.csproj" Id="f4fc17fa-800f-4f09-b876-a77e869f86cd" />
 </Solution>
