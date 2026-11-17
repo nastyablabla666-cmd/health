@@ -31,6 +31,7 @@ public class ReportForm : Form
     {
         var reportRichTextBox = new RichTextBox
         {
+            Name = "reportRichTextBox",
             Location = new Point(10, 10),
             Size = new Size(380, 280),
             ReadOnly = true
@@ -72,9 +73,9 @@ public class ActivityForm : Form
     private void CreateControls()
     {
         activityTypeLabel = new Label { Text = "Тип активности:", Location = new Point(10, 10), AutoSize = true };
-        activityTypeTextBox = new TextBox { Location = new Point(10, 30), Size = new Size(200, 20) };
+        activityTypeTextBox = new TextBox { Name = "activityTypeTextBox", Location = new Point(10, 30), Size = new Size(200, 20) };
         durationLabel = new Label { Text = "Продолжительность (минут):", Location = new Point(10, 55), AutoSize = true };
-        durationTextBox = new TextBox { Location = new Point(10, 75), Size = new Size(200, 20) };
+        durationTextBox = new TextBox { Name = "durationTextBox", Location = new Point(10, 75), Size = new Size(200, 20) };
 
         var okButton = new Button { Text = "OK", Location = new Point(10, 110), Size = new Size(80, 25) };
         okButton.Click += (sender, e) =>
@@ -129,9 +130,9 @@ public class NutritionForm : Form
     private void CreateControls()
     {
         foodItemLabel = new Label { Text = "Название пищи:", Location = new Point(10, 10), AutoSize = true };
-        foodItemTextBox = new TextBox { Location = new Point(10, 30), Size = new Size(200, 20) };
+        foodItemTextBox = new TextBox { Name = "foodItemTextBox", Location = new Point(10, 30), Size = new Size(200, 20) };
         caloriesLabel = new Label { Text = "Калорийность:", Location = new Point(10, 55), AutoSize = true };
-        caloriesTextBox = new TextBox { Location = new Point(10, 75), Size = new Size(200, 20) };
+        caloriesTextBox = new TextBox { Name = "caloriesTextBox", Location = new Point(10, 75), Size = new Size(200, 20) };
 
         var okButton = new Button { Text = "OK", Location = new Point(10, 110), Size = new Size(80, 25) };
         okButton.Click += (sender, e) =>
@@ -155,8 +156,6 @@ public class NutritionForm : Form
             DialogResult = DialogResult.Cancel;
             Close();
         };
-
-
 
         this.Controls.Add(foodItemLabel);
         this.Controls.Add(foodItemTextBox);
@@ -188,9 +187,9 @@ public class SleepForm : Form
     private void CreateControls()
     {
         dateLabel = new Label { Text = "Дата:", Location = new Point(10, 10), AutoSize = true };
-        dateTextBox = new TextBox { Location = new Point(10, 30), Size = new Size(200, 20) };
+        dateTextBox = new TextBox { Name = "dateTextBox", Location = new Point(10, 30), Size = new Size(200, 20) };
         hoursLabel = new Label { Text = "Количество часов:", Location = new Point(10, 55), AutoSize = true };
-        hoursTextBox = new TextBox { Location = new Point(10, 75), Size = new Size(200, 20) };
+        hoursTextBox = new TextBox { Name = "hoursTextBox", Location = new Point(10, 75), Size = new Size(200, 20) };
 
         var okButton = new Button { Text = "OK", Location = new Point(10, 110), Size = new Size(80, 25) };
         okButton.Click += (sender, e) =>
@@ -224,6 +223,116 @@ public class SleepForm : Form
     }
 }
 
+public class GoalsForm : Form
+{
+    private TextBox activityGoalTextBox;
+    private TextBox nutritionGoalTextBox;
+    private TextBox sleepGoalTextBox;
+
+    public decimal ActivityGoal { get; private set; }
+    public decimal NutritionGoal { get; private set; }
+    public decimal SleepGoal { get; private set; }
+
+    public GoalsForm()
+    {
+        this.Text = "Установить цели";
+        this.Width = 280;
+        this.Height = 260;
+        CreateControls();
+    }
+
+    private void CreateControls()
+    {
+        var activityLabel = new Label { Text = "Цель по активности (минут в день):", Location = new Point(10, 10), AutoSize = true };
+        activityGoalTextBox = new TextBox { Name = "activityGoalTextBox", Location = new Point(10, 30), Size = new Size(220, 20) };
+        var nutritionLabel = new Label { Text = "Цель по питанию (калорий в день):", Location = new Point(10, 60), AutoSize = true };
+        nutritionGoalTextBox = new TextBox { Name = "nutritionGoalTextBox", Location = new Point(10, 80), Size = new Size(220, 20) };
+        var sleepLabel = new Label { Text = "Цель по сну (часов в день):", Location = new Point(10, 110), AutoSize = true };
+        sleepGoalTextBox = new TextBox { Name = "sleepGoalTextBox", Location = new Point(10, 130), Size = new Size(220, 20) };
+
+        var okButton = new Button { Text = "OK", Location = new Point(10, 170), Size = new Size(80, 25) };
+        okButton.Click += (sender, e) =>
+        {
+            if (decimal.TryParse(activityGoalTextBox.Text, out decimal a) &&
+                decimal.TryParse(nutritionGoalTextBox.Text, out decimal n) &&
+                decimal.TryParse(sleepGoalTextBox.Text, out decimal s))
+            {
+                ActivityGoal = a;
+                NutritionGoal = n;
+                SleepGoal = s;
+                DialogResult = DialogResult.OK;
+                Close();
+            }
+            else
+            {
+                MessageBox.Show("Пожалуйста, введите корректные числовые значения целей.");
+            }
+        };
+
+        var cancelButton = new Button { Text = "Отмена", Location = new Point(150, 170), Size = new Size(80, 25) };
+        cancelButton.Click += (sender, e) =>
+        {
+            DialogResult = DialogResult.Cancel;
+            Close();
+        };
+
+        this.Controls.Add(activityLabel);
+        this.Controls.Add(activityGoalTextBox);
+        this.Controls.Add(nutritionLabel);
+        this.Controls.Add(nutritionGoalTextBox);
+        this.Controls.Add(sleepLabel);
+        this.Controls.Add(sleepGoalTextBox);
+        this.Controls.Add(okButton);
+        this.Controls.Add(cancelButton);
+    }
+}
+
+public class ProgressForm : Form
+{
+    public ProgressForm(List<ProgressItem> items, List<string> recommendations)
+    {
+        this.Text = "Прогресс и рекомендации";
+        this.Width = 420;
+        this.Height = 400;
+
+        int y = 10;
+        foreach (var item in items)
+        {
+            var label = new Label
+            {
+                Text = $"{item.Name}: {item.Current:0.#} из {item.Goal:0.#} {item.Unit} ({item.Percent}%)",
+                Location = new Point(10, y),
+                AutoSize = true
+            };
+            var bar = new ProgressBar
+            {
+                Location = new Point(10, y + 20),
+                Size = new Size(380, 20),
+                Minimum = 0,
+                Maximum = 100,
+                Value = Math.Max(0, Math.Min(100, item.Percent))
+            };
+            this.Controls.Add(label);
+            this.Controls.Add(bar);
+            y += 55;
+        }
+
+        var recLabel = new Label { Text = "Рекомендации:", Location = new Point(10, y), AutoSize = true };
+        var recBox = new RichTextBox
+        {
+            Name = "recommendationsBox",
+            Location = new Point(10, y + 20),
+            Size = new Size(380, 120),
+            ReadOnly = true
+        };
+        foreach (var r in recommendations)
+            recBox.AppendText("• " + r + "\n");
+
+        this.Controls.Add(recLabel);
+        this.Controls.Add(recBox);
+    }
+}
+
 public class HealthForm : Form
 {
     private HealthManager healthManager;
@@ -233,110 +342,6 @@ public class HealthForm : Form
     private Button displayReportButton;
     private Button setGoalsButton;
     private Button progressButton;
-
-    public class GoalsForm : Form
-    {
-        private TextBox activityTextBox;
-        private TextBox nutritionTextBox;
-        private TextBox sleepTextBox;
-
-        public decimal ActivityGoal { get; private set; }
-        public decimal NutritionGoal { get; private set; }
-        public decimal SleepGoal { get; private set; }
-
-        public GoalsForm()
-        {
-            this.Text = "Установить цели";
-            this.Width = 280;
-            this.Height = 260;
-            CreateControls();
-        }
-
-        private void CreateControls()
-        {
-            var activityLabel = new Label { Text = "Цель по активности (минут в день):", Location = new Point(10, 10), AutoSize = true };
-            activityTextBox = new TextBox { Location = new Point(10, 30), Size = new Size(220, 20) };
-            var nutritionLabel = new Label { Text = "Цель по питанию (калорий в день):", Location = new Point(10, 60), AutoSize = true };
-            nutritionTextBox = new TextBox { Location = new Point(10, 80), Size = new Size(220, 20) };
-            var sleepLabel = new Label { Text = "Цель по сну (часов в день):", Location = new Point(10, 110), AutoSize = true };
-            sleepTextBox = new TextBox { Location = new Point(10, 130), Size = new Size(220, 20) };
-
-            var okButton = new Button { Text = "OK", Location = new Point(10, 170), Size = new Size(80, 25) };
-            okButton.Click += (sender, e) =>
-            {
-                if (decimal.TryParse(activityTextBox.Text, out decimal a) &&
-                    decimal.TryParse(nutritionTextBox.Text, out decimal n) &&
-                    decimal.TryParse(sleepTextBox.Text, out decimal s))
-                {
-                    ActivityGoal = a;
-                    NutritionGoal = n;
-                    SleepGoal = s;
-                    DialogResult = DialogResult.OK;
-                    Close();
-                }
-                else
-                {
-                    MessageBox.Show("Пожалуйста, введите корректные числовые значения целей.");
-                }
-            };
-
-            var cancelButton = new Button { Text = "Отмена", Location = new Point(150, 170), Size = new Size(80, 25) };
-            cancelButton.Click += (sender, e) =>
-            {
-                DialogResult = DialogResult.Cancel;
-                Close();
-            };
-
-            this.Controls.Add(activityLabel);
-            this.Controls.Add(activityTextBox);
-            this.Controls.Add(nutritionLabel);
-            this.Controls.Add(nutritionTextBox);
-            this.Controls.Add(sleepLabel);
-            this.Controls.Add(sleepTextBox);
-            this.Controls.Add(okButton);
-            this.Controls.Add(cancelButton);
-        }
-    }
-
-    public class ProgressForm : Form
-    {
-        public ProgressForm(List<ProgressItem> items, List<string> recommendations)
-        {
-            this.Text = "Прогресс и рекомендации";
-            this.Width = 420;
-            this.Height = 400;
-
-            int y = 10;
-            foreach (var item in items)
-            {
-                var label = new Label
-                {
-                    Text = $"{item.Name}: {item.Current:0.#} из {item.Goal:0.#} {item.Unit} ({item.Percent}%)",
-                    Location = new Point(10, y),
-                    AutoSize = true
-                };
-                var bar = new ProgressBar
-                {
-                    Location = new Point(10, y + 20),
-                    Size = new Size(380, 20),
-                    Minimum = 0,
-                    Maximum = 100,
-                    Value = Math.Max(0, Math.Min(100, item.Percent))
-                };
-                this.Controls.Add(label);
-                this.Controls.Add(bar);
-                y += 55;
-            }
-
-            var recLabel = new Label { Text = "Рекомендации:", Location = new Point(10, y), AutoSize = true };
-            var recBox = new RichTextBox { Location = new Point(10, y + 20), Size = new Size(380, 120), ReadOnly = true };
-            foreach (var r in recommendations)
-                recBox.AppendText("• " + r + "\n");
-
-            this.Controls.Add(recLabel);
-            this.Controls.Add(recBox);
-        }
-    }
 
     public HealthForm()
     {
@@ -393,7 +398,6 @@ public class HealthForm : Form
         this.Controls.Add(displayReportButton);
         this.Controls.Add(setGoalsButton);
         this.Controls.Add(progressButton);
-
     }
 
     [STAThread]
