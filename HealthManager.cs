@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Windows.Forms;
 
 public class HealthManager
 {
-    private readonly Dictionary<string, decimal> activityTracking = new Dictionary<string, decimal>();
-    private readonly Dictionary<string, decimal> nutritionTracking = new Dictionary<string, decimal>();
+    private readonly Dictionary<string, decimal> activityTracking =
+        new Dictionary<string, decimal>(StringComparer.CurrentCultureIgnoreCase);
+    private readonly Dictionary<string, decimal> nutritionTracking =
+        new Dictionary<string, decimal>(StringComparer.CurrentCultureIgnoreCase);
     private readonly Dictionary<string, decimal> sleepTracking = new Dictionary<string, decimal>();
     private readonly Action<string> notify;
 
     public HealthManager() : this(null) { }
 
-    // notify позволяет в тестах подменить MessageBox
     public HealthManager(Action<string> notify)
     {
         this.notify = notify ?? (message => MessageBox.Show(message));
@@ -34,6 +36,7 @@ public class HealthManager
             return false;
         }
 
+        activityType = activityType.Trim();
         if (activityTracking.ContainsKey(activityType))
             activityTracking[activityType] += duration;
         else
@@ -56,6 +59,7 @@ public class HealthManager
             return false;
         }
 
+        foodItem = foodItem.Trim();
         if (nutritionTracking.ContainsKey(foodItem))
             nutritionTracking[foodItem] += calories;
         else
@@ -72,12 +76,22 @@ public class HealthManager
             notify("Введите дату.");
             return false;
         }
+
+        DateTime parsed;
+        if (!DateTime.TryParseExact(date.Trim(), new[] { "dd.MM.yyyy", "d.M.yyyy" },
+                CultureInfo.InvariantCulture, DateTimeStyles.None, out parsed))
+        {
+            notify("Введите дату в формате ДД.ММ.ГГГГ.");
+            return false;
+        }
+
         if (hours <= 0 || hours > 24)
         {
             notify("Количество часов сна должно быть больше 0 и не больше 24.");
             return false;
         }
 
+        date = parsed.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
         sleepTracking[date] = hours;
 
         notify($"Сон на {date} отслежен: {hours} часов.");
